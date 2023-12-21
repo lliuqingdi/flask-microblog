@@ -12,6 +12,7 @@ db = SQLAlchemy(app)
 #迁移引擎对象
 migrate = Migrate(app, db)
 login = LoginManager(app)
+login.login_view = 'login'
 
 # print('等会谁（哪个包或模块）在使用我：',__name__)
 # print(app.config['SECRET_KEY'])
