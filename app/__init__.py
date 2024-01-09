@@ -20,6 +20,7 @@ login = LoginManager(app)
 login.login_view = 'login'
 
 mail = Mail(app)
+
 # print('等会谁（哪个包或模块）在使用我：',__name__)
 # print(app.config['SECRET_KEY'])
 
