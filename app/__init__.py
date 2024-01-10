@@ -7,6 +7,7 @@ from flask_login import LoginManager
 from logging.handlers import RotatingFileHandler
 import os
 from flask_mail import Mail
+from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -20,6 +21,7 @@ login = LoginManager(app)
 login.login_view = 'login'
 
 mail = Mail(app)
+boot = Bootstrap(app)
 
 # print('等会谁（哪个包或模块）在使用我：',__name__)
 # print(app.config['SECRET_KEY'])
