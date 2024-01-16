@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 basedir1 = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir1, 'microblog.env'))
 
+
 class Config:
 	SECRET_KEY = os.environ.get('SECRET_KEY') or 'you will never guess'
 

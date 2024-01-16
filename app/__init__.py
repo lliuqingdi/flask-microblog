@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, request
+from flask import Flask, request, current_app
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -13,45 +13,70 @@ from flask_babel import Babel
 from flask_babel import lazy_gettext as _l
 
 def get_locale():
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
+    return request.accept_languages.best_match(current_app.config['LANGUAGES'])
 
-app = Flask(__name__)
-app.config.from_object(Config)
+# app = Flask(__name__)
+# app.config.from_object(Config)
 
 #数据库对象
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 #迁移引擎对象
-migrate = Migrate(app, db)
+migrate = Migrate()
 #强制用户登录
-login = LoginManager(app)
-login.login_view = 'login'
+login = LoginManager()
+login.login_view = 'auth.login'
 login.login_message = _l('Please log in to access this passage.')
 
-mail = Mail(app)
-boot = Bootstrap(app)
-moment = Moment(app)
-babel = Babel(app, locale_selector=get_locale)
+mail = Mail()
+boot = Bootstrap()
+moment = Moment()
+babel = Babel()
+bootstrap = Bootstrap()
 
 # print('等会谁（哪个包或模块）在使用我：',__name__)
 # print(app.config['SECRET_KEY'])
 
+def create_app(config_class):
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-if not app.debug:
-    # ...
+    db.init_app(app)
+    migrate.init_app(app, db)
+    login.init_app(app)
+    mail.init_app(app)
+    bootstrap.init_app(app)
+    moment.init_app(app)
+    babel.init_app(app)
 
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-    file_handler = RotatingFileHandler('logs/microblog.log', maxBytes=10240,
-                                       backupCount=10)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
+    from app.errors import bp as errors_bp
+    app.register_blueprint(errors_bp)
 
-    app.logger.setLevel(logging.INFO)
-    app.logger.info('Microblog startup')
+    from app.auth import bp as auth_bp
+    app.register_blueprint(auth_bp)
+
+    from app.main import bp as main_bp
+    app.register_blueprint(main_bp)
+
+    # from app.cli import bp as cli_bp
+    # app.register_blueprint(cli_bp)
+
+    if not app.debug and not app.testing:
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        file_handler = RotatingFileHandler('logs/microblog.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(
+            logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('Microblog startup')
+    return app
+
+# <-- remove errors from this import!
+from app import models
 
 
-#从app包中导入模块routes
-from app import routes, models, errors
+
+
 
