@@ -8,6 +8,7 @@ from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm
 from app.models import User
 from app.auth.email import send_password_reset_email
 
+
 @bp.route('/loginxx', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -25,10 +26,12 @@ def login():
         return redirect(next_page)
     return render_template('auth/login.html', title=_('Sign In'), form=form)
 
+
 @bp.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -45,6 +48,7 @@ def register():
     return render_template('auth/register.html', title=_('Register'),
                            form=form)
 
+
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
     if current_user.is_authenticated:
@@ -59,6 +63,7 @@ def reset_password_request():
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password_request.html',
                            title=_('Reset Password'), form=form)
+
 
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
