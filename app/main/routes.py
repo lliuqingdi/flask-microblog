@@ -121,16 +121,16 @@ def follow(username):
 @bp.route('/unfollow/<username>')
 @login_required
 def unfollow(username):
-    user = User.query.filter_by(username=username)
-    if user is None:
-        flash(_('User %(username)s not found.', username=username))
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        flash(f'User {username} not found.')
         return redirect(url_for('main.index'))
     if user == current_user:
-        flash(_('You cannot unfollow yourself!'))
+        flash('You cannot unfollow yourself!')
         return redirect(url_for('main.user', username=username))
     current_user.unfollow(user)
     db.session.commit()
-    flash(_('You are not following {username}.', username=username))
+    flash(f'You are not following {username} anymore.')
     return redirect(url_for('main.user', username=username))
 
 

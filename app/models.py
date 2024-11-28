@@ -75,6 +75,8 @@ class User(UserMixin, db.Model):
             self.followed.remove(user)
 
     def is_following(self, user):
+        if not user or not isinstance(user, User):
+            return False
         return self.followed.filter(followers.c.followed_id == user.id).count() > 0
 
     def followed_posts(self):
